@@ -22,6 +22,7 @@ namespace AndroidOperate
         ObservableCollection<Device> DeviceList = new ObservableCollection<Device>();
         private string CurrentDeviceId = "";
         ImageProcess imgp;
+        bool localADB = false;
         public MainWindow()
         {
             InitializeComponent();
@@ -57,6 +58,7 @@ namespace AndroidOperate
             CmdProcess.StartInfo.RedirectStandardInput = true;  // 重定向输入    
             CmdProcess.StartInfo.RedirectStandardOutput = true; // 重定向标准输出    
             CmdProcess.StartInfo.RedirectStandardError = true;  // 重定向错误输出 
+            localADB = File.Exists(Environment.CurrentDirectory + "\\ADB\\adb.exe");
         }
 
         private string RunCommand(string command,bool NeedRet, bool NeedWait = false)
@@ -73,7 +75,10 @@ namespace AndroidOperate
                 var index = command.IndexOf("adb.exe");
                 command = command.Insert(index + 7, " -s " + CurrentDeviceId);
             }
-            command = System.Environment.CurrentDirectory + "\\ADB\\" + command;
+            if (localADB)
+            {
+                command = Environment.CurrentDirectory + "\\ADB\\" + command;
+            }
             CmdProcess.StandardInput.WriteLine(command + "&exit"); //向cmd窗口发送输入信息  
             CmdProcess.StandardInput.AutoFlush = true;  //提交
             var tmp = "";
