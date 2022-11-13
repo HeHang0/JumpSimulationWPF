@@ -58,7 +58,24 @@ namespace AndroidOperate
             CmdProcess.StartInfo.RedirectStandardInput = true;  // 重定向输入    
             CmdProcess.StartInfo.RedirectStandardOutput = true; // 重定向标准输出    
             CmdProcess.StartInfo.RedirectStandardError = true;  // 重定向错误输出 
-            localADB = File.Exists(Environment.CurrentDirectory + "\\ADB\\adb.exe");
+            localADB = !IsInPATH("adb.exe") && File.Exists(Environment.CurrentDirectory + "\\ADB\\adb.exe");
+        }
+
+        private static bool IsInPATH(string command)
+        {
+            bool isInPath = false;
+            // 判断PATH中是否存在 命令
+            foreach (string test in (Environment.GetEnvironmentVariable("PATH") ?? "").Split(';'))
+            {
+                string path = test.Trim();
+                if (!String.IsNullOrEmpty(path) && File.Exists(Path.Combine(path, command)))
+                {
+                    isInPath = true;
+                    break; // 如果在PATH中找到 ，则退出循环
+                }
+            }
+
+            return isInPath;
         }
 
         private string RunCommand(string command,bool NeedRet, bool NeedWait = false)
